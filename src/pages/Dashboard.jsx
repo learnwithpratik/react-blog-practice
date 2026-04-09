@@ -1,29 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { RiDeleteBinLine } from "@remixicon/react";
 
 const Dashboard = () => {
   const { loggedInUser } = useAuth();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-  } = useForm({
+  const { register, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
       title: "",
       excerpt: "",
       content: "",
+      author:"",
       tags: [],
     },
   });
 
-    const tags = watch("tags"); // 👈 form-controlled tags
+  const tags = watch("tags"); // 👈 form-controlled tags
 
   const [blogs, setBlogs] = useState([]);
-
-  
 
   // Load blogs
   useEffect(() => {
@@ -34,7 +29,7 @@ const Dashboard = () => {
     );
 
     setBlogs(myBlogs);
-  }, []);
+  }, [loggedInUser]);
 
   // Submit blog
   const onSubmit = (data) => {
@@ -42,25 +37,36 @@ const Dashboard = () => {
       return alert("Unauthorized");
     }
 
-    const blogs = JSON.parse(localStorage.getItem("blogs")) || [];
+    const allBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
 
     const newBlog = {
       id: Date.now().toString(),
       ...data,
-      author: loggedInUser.name,
+      author: loggedInUser.name, // ✅ FIXED
       createdAt: new Date().toISOString(),
     };
 
-    localStorage.setItem("blogs", JSON.stringify([newBlog, ...blogs]));
+    const updatedBlogs = [newBlog, ...allBlogs];
 
-    alert("Article created successfully");
+    localStorage.setItem("blogs", JSON.stringify(updatedBlogs));
+
+    // ✅ Update UI instantly
+    setBlogs((prev) => [newBlog, ...prev]);
+
+    // alert("Article created successfully");
+    toast.success("Blog Created Succesfully");
     reset();
-
-    navigate("/");
+    navigate('/home')
   };
 
   const deleteBlog = (id) => {
     const allBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
+
+    const blogToDelete = allBlogs.find((b) => b.id === id);
+
+    if (blogToDelete.authorEmail !== loggedInUser.email) {
+      return alert("Unauthorized");
+    }
 
     const updated = allBlogs.filter((b) => b.id !== id);
 
@@ -90,14 +96,13 @@ const Dashboard = () => {
   const removeTag = (tagToRemove) => {
     setValue(
       "tags",
-      tags.filter((tag) => tag !== tagToRemove)
+      tags.filter((tag) => tag !== tagToRemove),
     );
   };
 
   return (
     <div className="w-full min-h-screen bg-gray-50 py-10">
       <div className="max-w-3xl mx-auto bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-
         <button
           onClick={() => navigate(-1)}
           className="text-sm text-gray-500 mb-4"
@@ -105,12 +110,9 @@ const Dashboard = () => {
           ← Back to Dashboard
         </button>
 
-        <h1 className="text-2xl font-semibold mb-6">
-          Create New Article
-        </h1>
+        <h1 className="text-2xl font-semibold mb-6">Create New Article</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
           {/* Title */}
           <div>
             <label className="block text-sm font-medium mb-1">Title</label>
@@ -123,9 +125,7 @@ const Dashboard = () => {
 
           {/* Excerpt */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Excerpt
-            </label>
+            <label className="block text-sm font-medium mb-1">Excerpt</label>
             <textarea
               {...register("excerpt")}
               placeholder="Write a brief summary of your article..."
@@ -138,9 +138,7 @@ const Dashboard = () => {
 
           {/* Content */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Content
-            </label>
+            <label className="block text-sm font-medium mb-1">Content</label>
             <textarea
               {...register("content", { required: "Content is required" })}
               placeholder="Write your article content here... (Markdown supported)"
@@ -162,9 +160,7 @@ const Dashboard = () => {
               className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
             />
 
-            <p className="text-xs text-gray-400 mt-1">
-              Add up to 5 tags
-            </p>
+            <p className="text-xs text-gray-400 mt-1">Add up to 5 tags</p>
 
             <div className="flex gap-2 mt-2 flex-wrap">
               {tags.map((tag, i) => (
@@ -187,6 +183,49 @@ const Dashboard = () => {
             Publish Article
           </button>
         </form>
+      </div>
+
+      {/* 🔥 MY ARTICLES */}
+      <div className="mt-10 w-1/2 m-auto ">
+        <h2 className="text-xl font-semibold mb-4">Your Articles</h2>
+
+        {blogs.length === 0 ? (
+          <p className="text-gray-500">No articles yet.</p>
+        ) : (
+          <div className="space-y-4">
+            {blogs.map((blog) => (
+              <div
+                key={blog.id}
+                className="border p-4 rounded-lg flex justify-between items-start"
+              >
+                <div>
+                  <h3 className="font-semibold text-lg">{blog.title}</h3>
+                  <p className="text-gray-500 text-sm">
+                    {blog.excerpt || blog.content.slice(0, 100) + "..."}
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  {/* ✏️ Edit */}
+                  <button
+                    onClick={() => handleEdit(blog)}
+                    className="text-blue-600 text-sm"
+                  >
+                    Edit
+                  </button>
+
+                  {/* 🗑️ Delete */}
+                  <button
+                    onClick={() => deleteBlog(blog.id)}
+                    className="text-red-500 text-sm"
+                  >
+                    <RiDeleteBinLine />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

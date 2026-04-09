@@ -4,9 +4,11 @@ import App from "./App.jsx";
 import { BrowserRouter, RouterProvider } from "react-router";
 import AppRoutes from "./routes/AppRoutes.jsx";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastContainer } from "react-toastify";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
     <AppRoutes />
+    <ToastContainer />
   </AuthProvider>,
 );

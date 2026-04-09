@@ -49,6 +49,17 @@ const Navbar = () => {
           ) : (
             <div className="flex items-center gap-3">
               <p className="text-black">Welcome, {loggedInUser.name}</p>
+
+              {/* 🔥 Show only for Author */}
+              {loggedInUser.role === "Author" && (
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="px-4 py-1 bg-blue-600 text-white rounded-md"
+                >
+                  Dashboard
+                </button>
+              )}
+
               <button
                 onClick={handleLogout}
                 className="px-4 py-1 bg-red-600 text-white rounded-md"
