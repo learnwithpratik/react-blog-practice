@@ -1,12 +1,42 @@
-# React + Vite
+# 📝 React Blog Practice
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple blog application built using React as part of learning and practicing modern frontend development.
 
-Currently, two official plugins are available:
+🚧 **Status: Work in Progress** 🚧  
+This project is currently under active development. Features, UI, and structure may change frequently as learning progresses.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 📌 About the Project
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This project is a hands-on practice application focused on building a blog interface using React. The goal is to strengthen core React concepts such as:
+
+- Component-based architecture
+- State management
+- Props handling
+- Routing (if implemented)
+- UI/UX structuring
+
+Building real-world projects like blog apps is a common and effective way to improve React skills and understand practical use cases.
+
+---
+
+## 🚀 Features (Planned / In Progress & Process)
+
+- 📰 Blog post listing
+- 📄 Individual post view
+- 🔍 Search / filter posts
+- 🧭 Navigation with React Router
+- 🎨 Responsive UI
+- ⚡ API integration (future enhancement)
+
+---
+
+## 🛠️ Tech Stack
+
+- React.js
+- JavaScript (ES6+)
+- Tailwindcss 
+- React Router
+
+---
