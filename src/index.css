@@ -1,0 +1,31 @@
+@import "tailwindcss";
+@font-face {
+    font-family: krona;
+    src: url(./assets/KronaOne-Regular.ttf);
+}
+@font-face {
+    font-family: lexMd;
+    src: url(./assets/LexendDeca-Medium.ttf);
+}
+@font-face {
+    font-family: lexSb;
+    src: url(./assets/LexendDeca-SemiBold.ttf);
+}
+@font-face {
+    font-family: lexReg;
+    src: url(./assets/LexendDeca-Regular.ttf);
+}
+
+.font-krona{
+    font-family: krona;
+}
+
+.font-lexmd{
+    font-family: lexMd;
+}
+.font-lexsb{
+    font-family: lexSb;
+}
+.font-lexreg{
+    font-family: lexReg;
+}
