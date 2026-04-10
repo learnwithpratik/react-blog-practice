@@ -7,6 +7,7 @@ import SignUp from "../pages/SignUp";
 import MainLayout from "../layouts/MainLayout";
 // import AuthProtedcted from "./AuthProtedcted";
 import Dashboard from "../pages/Dashboard";
+import ArticleDetailPage from "../pages/ArticleDetailPage";
 
 const AppRoutes = () => {
   const router = createBrowserRouter([
@@ -17,6 +18,8 @@ const AppRoutes = () => {
         { index: true, element: <Home /> },
         { path: "login", element: <Login /> },
         { path: "signup", element: <SignUp /> },
+        { path: "article/:id", element: <ArticleDetailPage /> },
+
 
         // Reader
         {

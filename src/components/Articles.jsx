@@ -1,11 +1,16 @@
-import { RiCalendar2Line, RiDeleteBinLine, RiUser3Line } from "@remixicon/react";
+import {
+  RiCalendar2Line,
+  RiDeleteBinLine,
+  RiUser3Line,
+} from "@remixicon/react";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router";
 
 const Articles = () => {
+  let navigate = useNavigate();
   const [articles, setArticles] = useState([]);
   const { loggedInUser } = useAuth();
-
 
   useEffect(() => {
     const storedBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
@@ -31,70 +36,76 @@ const Articles = () => {
     );
   }
 
-const handleDelete = (id) => {
-  const storedBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
+  const handleDelete = (id) => {
+    const storedBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
 
-  const blogToDelete = storedBlogs.find((b) => b.id === id);
+    const blogToDelete = storedBlogs.find((b) => b.id === id);
 
-  if (blogToDelete.authorEmail !== loggedInUser.email) {
-    return alert("You can only delete your own blogs");
-  }
+    if (blogToDelete.authorEmail !== loggedInUser.email) {
+      return alert("You can only delete your own blogs");
+    }
 
-  const updatedBlogs = storedBlogs.filter((blog) => blog.id !== id);
+    const updatedBlogs = storedBlogs.filter((blog) => blog.id !== id);
 
-  localStorage.setItem("blogs", JSON.stringify(updatedBlogs));
+    localStorage.setItem("blogs", JSON.stringify(updatedBlogs));
 
-  setArticles((prev) => prev.filter((article) => article.id !== id));
-};
+    setArticles((prev) => prev.filter((article) => article.id !== id));
+  };
   return (
-    <div className="">
-      <div className="flex items-center justify-between">
-        <h1 className="font-semibold text-2xl font-lexsb">Latest Articles</h1>
-        <p className="text-gray-500 font-lexreg font-normal">
+    <div className="max-w-3xl mx-auto">
+      {/* 🔥 Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <h1 className="font-semibold text-xl sm:text-2xl">Latest Articles</h1>
+
+        <p className="text-gray-500 text-sm sm:text-md font-semibold ">
           {articles.length} articles
         </p>
       </div>
 
-      <div className="mt-6 grid grid-cols-3 gap-4">
+      {/* 🔥 Grid */}
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {articles.map((article) => (
           <div
             key={article.id}
-            className="border border-gray-800/30 hover:border-blue-600 duration-400 p-4 rounded-lg flex flex-col gap-2"
+            className="border border-gray-800/30 hover:border-blue-600 transition-all duration-300 p-4 rounded-lg flex flex-col gap-3 bg-white dark:bg-zinc-300/10"
           >
-            <div className="flex gap-1 mt-2 flex-wrap">
+            {/* 🏷️ Tags */}
+            <div className="flex gap-1 flex-wrap ">
               {article.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="bg-gray-300 px-2 py-1 rounded-full text-sm"
+                  className="bg-gray-300/10 border border-blue-600/30 hover:bg-blue-400/30 duration-300 cursor-pointer p-0.5 px-1 rounded-full text-xs sm:text-sm"
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            <h2 className="text-3xl font-semibold hover:text-blue-600 duration-300 cursor-pointer">
+            {/* 📝 Title */}
+            <h2
+              onClick={() => navigate(`/article/${article.id}`)}
+              className="text-lg sm:text-xl md:text-2xl font-semibold hover:text-blue-600 transition cursor-pointer leading-snug"
+            >
               {article.title}
             </h2>
 
-            <p className="text-gray-500">{article.description}</p>
+            {/* 📄 Description */}
+            <p className="text-gray-600 text-sm line-clamp-1">
+              {article.description}
+            </p>
 
-            <div className="flex items-center justify-between pt-3 border-t border-t-gray-500/40 mt-2">
-              <p className="text-sm text-gray-600 flex items-center gap-1">
-                <RiUser3Line className="w-4 h-4" /> By {article.author}
+            {/* 👤 Footer */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-3 border-t border-gray-400/80 mt-2">
+              <p className="text-xs sm:text-sm text-gray-600  flex items-center gap-1">
+                <RiUser3Line className="w-4 h-4 " />
+                {article.author}
               </p>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
+
+              <p className="text-xs sm:text-sm text-gray-600 flex items-center gap-1">
                 <RiCalendar2Line className="w-4 h-4" />
                 {article.publish_date}
               </p>
             </div>
-
-            <button
-              onClick={() => handleDelete(article.id)}
-              className="text-red-500 text-sm hover:underline"
-            >
-              <RiDeleteBinLine />
-            </button>
-
           </div>
         ))}
       </div>

@@ -2,70 +2,49 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { RiDeleteBinLine } from "@remixicon/react";
+import { RiDeleteBinLine, RiPencilFill, RiPencilLine } from "@remixicon/react";
+import BlogForm from "../components/BlogForm";
 
 const Dashboard = () => {
   const { loggedInUser } = useAuth();
-  const { register, handleSubmit, setValue, watch, reset } = useForm({
-    defaultValues: {
-      title: "",
-      excerpt: "",
-      content: "",
-      author:"",
-      tags: [],
-    },
-  });
-
-  const tags = watch("tags"); // 👈 form-controlled tags
 
   const [blogs, setBlogs] = useState([]);
+  const [showForm, setShowForm] = useState(false);
 
-  // Load blogs
+  // 🔥 Load ONLY logged-in user's blogs
   useEffect(() => {
     const allBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
 
-    const myBlogs = allBlogs.filter(
-      (b) => b.authorEmail === loggedInUser.email,
-    );
+    const myBlogs = allBlogs.filter((b) => {
+      // ✅ Support both new + old data
+      if (b.authorEmail) {
+        return b.authorEmail.toLowerCase() === loggedInUser.email.toLowerCase();
+      }
+
+      // fallback for old blogs
+      return b.author === loggedInUser.name;
+    });
 
     setBlogs(myBlogs);
   }, [loggedInUser]);
 
-  // Submit blog
-  const onSubmit = (data) => {
-    if (loggedInUser.role !== "Author") {
-      return alert("Unauthorized");
-    }
-
-    const allBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
-
-    const newBlog = {
-      id: Date.now().toString(),
-      ...data,
-      author: loggedInUser.name, // ✅ FIXED
-      createdAt: new Date().toISOString(),
-    };
-
-    const updatedBlogs = [newBlog, ...allBlogs];
-
-    localStorage.setItem("blogs", JSON.stringify(updatedBlogs));
-
-    // ✅ Update UI instantly
+  // 🔥 After new blog created
+  const handleAddSuccess = (newBlog) => {
     setBlogs((prev) => [newBlog, ...prev]);
-
-    // alert("Article created successfully");
-    toast.success("Blog Created Succesfully");
-    reset();
-    navigate('/home')
+    setShowForm(false);
   };
 
+  // 🔥 Delete blog (safe)
   const deleteBlog = (id) => {
     const allBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
 
     const blogToDelete = allBlogs.find((b) => b.id === id);
 
-    if (blogToDelete.authorEmail !== loggedInUser.email) {
-      return alert("Unauthorized");
+    if (
+      blogToDelete.authorEmail &&
+      blogToDelete.authorEmail !== loggedInUser.email
+    ) {
+      return toast.danger("Unauthorized");
     }
 
     const updated = allBlogs.filter((b) => b.id !== id);
@@ -73,151 +52,63 @@ const Dashboard = () => {
     localStorage.setItem("blogs", JSON.stringify(updated));
 
     setBlogs((prev) => prev.filter((b) => b.id !== id));
+    
   };
-
-  // 🔥 Handle tag input
-  const handleTagKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-
-      const value = e.target.value.trim();
-      if (!value) return;
-
-      if (tags.length >= 5) return;
-
-      if (!tags.includes(value)) {
-        setValue("tags", [...tags, value]);
-      }
-
-      e.target.value = "";
-    }
-  };
-
-  const removeTag = (tagToRemove) => {
-    setValue(
-      "tags",
-      tags.filter((tag) => tag !== tagToRemove),
-    );
-  };
-
   return (
-    <div className="w-full min-h-screen bg-gray-50 py-10">
-      <div className="max-w-3xl mx-auto bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+    <div className="w-full min-h-screen bg-gray-50  px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-10">
+
+      {/* 🔥 Top Section */}
+      <div className="max-w-3xl mx-auto">
+
         <button
-          onClick={() => navigate(-1)}
-          className="text-sm text-gray-500 mb-4"
+          onClick={() => setShowForm(!showForm)}
+          className="mb-6 px-4 py-2 bg-blue-600 text-white rounded-md w-full sm:w-auto"
         >
-          ← Back to Dashboard
+          {showForm ? "Cancel" : "Add Blog"}
         </button>
 
-        <h1 className="text-2xl font-semibold mb-6">Create New Article</h1>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Title</label>
-            <input
-              {...register("title", { required: "Title is required" })}
-              placeholder="Enter a compelling title..."
-              className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Excerpt */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Excerpt</label>
-            <textarea
-              {...register("excerpt")}
-              placeholder="Write a brief summary of your article..."
-              className="w-full border border-gray-300 rounded-md p-3 h-24 focus:ring-2 focus:ring-blue-500"
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              A short description that appears on the blog listing
-            </p>
-          </div>
-
-          {/* Content */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Content</label>
-            <textarea
-              {...register("content", { required: "Content is required" })}
-              placeholder="Write your article content here... (Markdown supported)"
-              className="w-full border border-gray-300 rounded-md p-3 h-40 focus:ring-2 focus:ring-blue-500"
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              Supports Markdown: ## for headers, **bold**, *italic*, `code`
-            </p>
-          </div>
-
-          {/* Tags */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Tags</label>
-
-            <input
-              type="text"
-              placeholder="Add tags (press Enter to add)"
-              onKeyDown={handleTagKeyDown}
-              className="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
-            />
-
-            <p className="text-xs text-gray-400 mt-1">Add up to 5 tags</p>
-
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {tags.map((tag, i) => (
-                <span
-                  key={i}
-                  onClick={() => removeTag(tag)}
-                  className="bg-blue-100 text-blue-600 px-2 py-1 text-xs rounded cursor-pointer"
-                >
-                  {tag} ✕
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-3 rounded-md"
-          >
-            Publish Article
-          </button>
-        </form>
+        {showForm && <BlogForm onSuccess={handleAddSuccess} />}
       </div>
 
-      {/* 🔥 MY ARTICLES */}
-      <div className="mt-10 w-1/2 m-auto ">
-        <h2 className="text-xl font-semibold mb-4">Your Articles</h2>
+      {/* 🔥 Articles List */}
+      <div className="mt-8 sm:mt-10 max-w-3xl mx-auto">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-black">
+          Your Articles
+        </h2>
 
         {blogs.length === 0 ? (
-          <p className="text-gray-500">No articles yet.</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            No articles yet.
+          </p>
         ) : (
           <div className="space-y-4">
             {blogs.map((blog) => (
               <div
                 key={blog.id}
-                className="border p-4 rounded-lg flex justify-between items-start"
+                className="border border-gray-300 dark:border-gray-700 p-4 rounded-lg bg-zinc-600/5  flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3"
               >
-                <div>
-                  <h3 className="font-semibold text-lg">{blog.title}</h3>
-                  <p className="text-gray-500 text-sm">
-                    {blog.excerpt || blog.content.slice(0, 100) + "..."}
+
+                {/* 📝 Content */}
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base sm:text-lg">
+                    {blog.title}
+                  </h3>
+
+                  <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2">
+                    {blog.excerpt ||
+                      blog.content?.slice(0, 100) + "..."}
                   </p>
                 </div>
 
-                <div className="flex gap-3">
-                  {/* ✏️ Edit */}
-                  <button
-                    onClick={() => handleEdit(blog)}
-                    className="text-blue-600 text-sm"
-                  >
-                    Edit
+                {/* 🔧 Actions */}
+                <div className="flex gap-3 items-center justify-end sm:justify-start">
+                  <button className="text-blue-600 text-lg">
+                    <RiPencilLine />
                   </button>
 
-                  {/* 🗑️ Delete */}
                   <button
                     onClick={() => deleteBlog(blog.id)}
-                    className="text-red-500 text-sm"
+                    className="text-red-500 text-lg"
                   >
                     <RiDeleteBinLine />
                   </button>

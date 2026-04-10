@@ -9,6 +9,6 @@ import { ToastContainer } from "react-toastify";
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
     <AppRoutes />
-    <ToastContainer />
+    <ToastContainer position="bottom-right" theme="dark"/>
   </AuthProvider>,
 );

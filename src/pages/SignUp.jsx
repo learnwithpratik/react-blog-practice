@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 
 const SignUp = () => {
   let navigate = useNavigate();
-  let {registeredUser,setRegisteredUser} = useAuth();
+  let { registeredUser, setRegisteredUser } = useAuth();
   const {
     register,
     handleSubmit,
@@ -28,68 +28,90 @@ const SignUp = () => {
 
   return (
     <>
-           <div className="w-full h-full bg-blue-100/10 pt-12">
-        <div className="w-6/12 m-auto">
-          <div className="flex flex-col items-center justify-center border rounded-xl border-gray-500/20 px-32 py-3 ">
-            <div className=" bg-blue-600 p-4 rounded-full">
-              <RiEdit2Line className="text-white drop-shadow-blue-600" />
+      <div className="w-full min-h-screen bg-blue-100/10 px-4 sm:px-6 md:px-0 py-8 sm:py-12">
+        <div className="w-full sm:w-10/12 md:w-8/12 lg:w-6/12 mx-auto">
+          <div className="flex flex-col items-center justify-center border rounded-xl border-gray-500/20 px-6 sm:px-10 md:px-16 lg:px-24 py-4 sm:py-6">
+            {/* Logo */}
+            <div className="bg-blue-600 p-3 sm:p-4 rounded-full">
+              <RiEdit2Line className="text-white text-lg sm:text-xl drop-shadow-blue-600" />
             </div>
-            <div className="flex flex-col text-center">
-              <h1 className="text-2xl font-lexsb">Today's your day</h1>
-              <p className="text-sm font-lexreg  text-gray-400">
+
+            {/* Heading */}
+            <div className="flex flex-col text-center mt-3 sm:mt-4">
+              <h1 className="text-xl sm:text-2xl font-lexsb">
+                Today's your day
+              </h1>
+              <p className="text-xs sm:text-sm font-lexreg text-gray-400">
                 Sign Up to share your knowledge
               </p>
             </div>
 
-            <div className="w-full p-3">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+            {/* Form */}
+            <div className="w-full p-2 sm:p-3 mt-2">
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-3 sm:space-y-4"
+              >
+                {/* Name */}
                 <div className="flex flex-col">
-                  <label>Name</label>
+                  <label className="text-xs sm:text-sm">Name</label>
                   <input
                     {...register("name", { required: "Name is required" })}
-                    className="border border-zinc-600 rounded-sm p-2"
+                    className="border border-zinc-600 rounded-sm p-2 text-sm sm:text-base"
                     type="text"
                     placeholder="Enter your Name"
                   />
                   {errors.name && (
-                    <p className="text-red-600">{errors.name.message}</p>
+                    <p className="text-red-600 text-xs sm:text-sm">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
+
+                {/* Email */}
                 <div className="flex flex-col">
-                  <label>Email</label>
+                  <label className="text-xs sm:text-sm">Email</label>
                   <input
                     {...register("email", { required: "email is needed" })}
-                    className="border border-zinc-600 rounded-sm p-2"
+                    className="border border-zinc-600 rounded-sm p-2 text-sm sm:text-base"
                     type="email"
                     placeholder="Email"
                   />
                   {errors.email && (
-                    <p className="text-red-600">{errors.email.message}</p>
+                    <p className="text-red-600 text-xs sm:text-sm">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
+
+                {/* Password */}
                 <div className="flex flex-col">
-                  <label>Password</label>
+                  <label className="text-xs sm:text-sm">Password</label>
                   <input
                     {...register("password", { required: "Password is must." })}
-                    className="border border-zinc-600 rounded-sm p-2"
+                    className="border border-zinc-600 rounded-sm p-2 text-sm sm:text-base"
                     type="password"
                     placeholder="Password"
                   />
                   {errors.password && (
-                    <p className="text-red-600">{errors.password.message}</p>
+                    <p className="text-red-600 text-xs sm:text-sm">
+                      {errors.password.message}
+                    </p>
                   )}
                 </div>
+
+                {/* Confirm Password */}
                 <div className="flex flex-col">
-                  <label>Confirm Password</label>
+                  <label className="text-xs sm:text-sm">Confirm Password</label>
                   <input
                     {...register("confirmPassword", {
                       required: "Confirm password",
                       validate: (value) =>
                         value === password || "Passwords do not match",
                     })}
-                    className="border border-zinc-600 rounded-sm p-2"
+                    className="border border-zinc-600 rounded-sm p-2 text-sm sm:text-base"
                     type="password"
-                    placeholder="Password"
+                    placeholder="Confirm Password"
                   />
                   {errors.confirmPassword && (
                     <p className="text-red-400 text-xs">
@@ -98,40 +120,33 @@ const SignUp = () => {
                   )}
                 </div>
 
-                <div>
-                  <label>Select Role</label>
+                {/* Role */}
+                <div className="flex flex-col">
+                  <label className="text-xs sm:text-sm">Select Role</label>
                   <select
-                    className="w-full px-2 py-2 border border-zinc-800/80 rounded-md"
+                    className="w-full px-2 py-2 border border-zinc-800/80 rounded-md text-sm sm:text-base"
                     {...register("role", { required: "select role." })}
                   >
-                    <option
-                      className="border-b border-b-white bg-blue-600 rounded-lg text-white "
-                      value="Reader"
-                    >
-                      Reader
-                    </option>
-                    <option
-                      className="border-b border-b-white bg-blue-800 rounded-lg text-white "
-                      value="Author"
-                    >
-                      Author
-                    </option>
+                    <option value="Reader">Reader</option>
+                    <option value="Author">Author</option>
                   </select>
                 </div>
 
+                {/* Submit */}
                 <div className="flex flex-col">
                   <button
                     disabled={!isValid}
-                    className="p-2 bg-blue-600 text-white rounded-md"
+                    className="p-2.5 sm:p-2 bg-blue-600 text-white text-sm sm:text-base rounded-md disabled:opacity-50"
                   >
                     Sign Up
                   </button>
                 </div>
 
+                {/* Footer */}
                 <div>
-                  <p className="text-center text-sm flex items-center justify-center gap-1">
+                  <p className="text-center text-xs sm:text-sm flex flex-wrap items-center justify-center gap-1">
                     Already have an account?
-                    <NavLink to="/signup">
+                    <NavLink to="/login">
                       <span className="text-blue-600">Sign In</span>
                     </NavLink>
                   </p>
